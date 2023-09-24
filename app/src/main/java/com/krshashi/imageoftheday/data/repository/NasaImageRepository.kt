@@ -22,8 +22,7 @@ class NasaImageRepository @Inject constructor(
         return try {
             val result = networkDataSource.getDailyImage(
                 resultCount = 1,
-                reqThumbnail = true,
-                apiKey = ""
+                reqThumbnail = true
             )
 
             if (result.isNotEmpty()) {

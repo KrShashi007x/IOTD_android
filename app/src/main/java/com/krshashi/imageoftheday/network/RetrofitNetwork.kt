@@ -1,5 +1,6 @@
 package com.krshashi.imageoftheday.network
 
+import com.krshashi.imageoftheday.BuildConfig
 import com.krshashi.imageoftheday.data.model.ImageItemEntity
 import okhttp3.Call
 import retrofit2.Retrofit
@@ -10,10 +11,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface NetworkDataSource {
-   suspend fun getDailyImage(
+    suspend fun getDailyImage(
         resultCount: Int,
-        reqThumbnail: Boolean,
-        apiKey: String
+        reqThumbnail: Boolean
     ): List<ImageItemEntity>
 }
 
@@ -22,14 +22,14 @@ private interface RetrofitNetworkApi {
     suspend fun getRequest(
         @Query("count") resultCount: Int,
         @Query("thumbs") reqThumbnail: Boolean,
-        @Query("api_key") apiKey: String,
+        @Query("api_key") apiKey: String = BuildConfig.api_key,
     ): List<ImageItemEntity>
 }
 
 @Singleton
 class RetrofitNetwork @Inject constructor(
     okhttpCallFactory: Call.Factory
-) :NetworkDataSource {
+) : NetworkDataSource {
     private val baseUrl: String = "https://api.nasa.gov/"
 
     private val networkAPI = Retrofit.Builder()
@@ -42,6 +42,5 @@ class RetrofitNetwork @Inject constructor(
     override suspend fun getDailyImage(
         resultCount: Int,
         reqThumbnail: Boolean,
-        apiKey: String
-    ) = networkAPI.getRequest(resultCount, reqThumbnail, apiKey)
+    ) = networkAPI.getRequest(resultCount, reqThumbnail)
 }
