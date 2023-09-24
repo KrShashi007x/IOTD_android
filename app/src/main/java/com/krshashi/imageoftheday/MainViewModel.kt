@@ -26,8 +26,10 @@ class MainViewModel @Inject constructor(
         refreshImageOfTheDayContent()
     }
 
-    fun refreshImageOfTheDayContent() = viewModelScope.launch(Dispatchers.IO) {
-        imageRepository.refreshDailyImage()
+    fun refreshImageOfTheDayContent() {
+        viewModelScope.launch(Dispatchers.IO) {
+            imageRepository.refreshDailyImage()
+        }
     }
 
 }

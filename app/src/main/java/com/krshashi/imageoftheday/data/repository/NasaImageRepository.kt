@@ -24,9 +24,8 @@ class NasaImageRepository @Inject constructor(
                 resultCount = 1,
                 reqThumbnail = true
             )
-
             if (result.isNotEmpty()) {
-                imageItemDao.refresh(result[0])
+                imageItemDao.save(result[0])
                 ResponseState.Success(Unit)
             } else {
                 ResponseState.Failure("Error: Contains no items in response")
