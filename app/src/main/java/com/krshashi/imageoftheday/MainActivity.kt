@@ -7,10 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import coil.request.CachePolicy
+import com.google.android.material.snackbar.Snackbar
 import com.krshashi.imageoftheday.databinding.ActivityMainBinding
 import com.krshashi.imageoftheday.domain.model.ImageItem
 import com.krshashi.imageoftheday.domain.model.MediaType
-import com.krshashi.imageoftheday.utils.logger
+import com.krshashi.imageoftheday.network.ResponseState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binder: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
+    private var displayingContent: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binder = ActivityMainBinding.inflate(layoutInflater)
@@ -32,17 +35,34 @@ class MainActivity : AppCompatActivity() {
             viewModel.refreshImageOfTheDayContent()
         }
 
-        // TODO : Show error initial + regular
+        lifecycleScope.launch {
+            viewModel.imageUiState.filterNotNull()
+                .onEach { binder.loadingView.visibility = View.GONE }
+                .onEach { displayingContent = true }
+                .collect(::updateContentView)
+        }
+
+        contentErrorHandler()
+    }
+
+    private fun contentErrorHandler() {
+        val snackBar = Snackbar.make(
+            binder.root,
+            "Unable to load new content 😭",
+            Snackbar.LENGTH_LONG
+        )
 
         lifecycleScope.launch {
-            viewModel.imageUiState
-                .filterNotNull()
-                .onEach { logger(it.toString()) }
-                .collect {
-                    binder.refreshLayout.isRefreshing = false
-                    binder.loadingView.visibility = View.GONE
-                    updateContentView(it)
+            viewModel.imageErrorState.collect {
+                when (it) {
+                    is ResponseState.Loading -> Unit
+                    is ResponseState.Success -> binder.refreshLayout.isRefreshing = false
+                    is ResponseState.Failure -> {
+                        binder.refreshLayout.isRefreshing = false
+                        snackBar.setAction("Ok") { snackBar.dismiss() }.show()
+                    }
                 }
+            }
         }
     }
 
