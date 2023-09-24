@@ -44,7 +44,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-black"
-                        android:text="@string/app_name"
+                        android:text="@string/app_title"
                         android:textColor="@color/black"
                         android:textSize="24sp"
                         tools:layout_editor_absoluteX="16dp"
@@ -57,6 +57,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@+id/topBar" />
+
+                <ImageView
+                    android:id="@+id/playButtonView"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/play_icon"
+                    app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                    app:layout_constraintTop_toTopOf="@+id/imageView"
+                    app:layout_constraintStart_toStartOf="@+id/imageView"
+                    app:layout_constraintEnd_toEndOf="@+id/imageView"/>
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/titleTextView"

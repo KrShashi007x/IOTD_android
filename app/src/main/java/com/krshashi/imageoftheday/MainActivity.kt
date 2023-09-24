@@ -9,6 +9,7 @@ import coil.load
 import coil.request.CachePolicy
 import com.krshashi.imageoftheday.databinding.ActivityMainBinding
 import com.krshashi.imageoftheday.domain.model.ImageItem
+import com.krshashi.imageoftheday.domain.model.MediaType
 import com.krshashi.imageoftheday.utils.logger
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
             viewModel.refreshImageOfTheDayContent()
         }
 
+        // TODO : Show error initial + regular
+
         lifecycleScope.launch {
             viewModel.imageUiState
                 .filterNotNull()
@@ -48,6 +51,11 @@ class MainActivity : AppCompatActivity() {
         binder.descriptionTextView.text = imageItem.title
         binder.dateTextView.text = imageItem.date
         binder.descriptionTextView.text = imageItem.explanation
+
+        when (imageItem.mediaType) {
+            MediaType.VIDEO -> binder.playButtonView.visibility = View.VISIBLE
+            else -> binder.playButtonView.visibility = View.INVISIBLE
+        }
 
         // Caching image offline
         binder.imageView.load(imageItem.hdurl) {
