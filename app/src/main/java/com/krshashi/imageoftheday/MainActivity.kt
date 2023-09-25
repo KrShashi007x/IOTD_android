@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binder: ActivityMainBinding
     private val viewModel: MainViewModel by viewModels()
 
-    private var displayingContent: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binder = ActivityMainBinding.inflate(layoutInflater)
@@ -35,13 +33,16 @@ class MainActivity : AppCompatActivity() {
             viewModel.refreshImageOfTheDayContent()
         }
 
+        // Observing image content, filter out null imageState and disable the loading spinner
+        // (if proper data is observed)
         lifecycleScope.launch {
             viewModel.imageUiState.filterNotNull()
                 .onEach { binder.loadingView.visibility = View.GONE }
-                .onEach { displayingContent = true }
                 .collect(::updateContentView)
         }
 
+        // Observing network request state and showing error
+        // if request unable to respond successfully
         contentErrorHandler()
     }
 
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity() {
             else -> binder.playButtonView.visibility = View.INVISIBLE
         }
 
-        // Caching image offline
+        // Showing image preview and caching it offline in disk
         binder.imageView.load(imageItem.hdurl) {
             diskCachePolicy(CachePolicy.ENABLED)
             placeholder(R.drawable.placeholder_view)

@@ -10,6 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+/**
+ * Repository class responsible for providing the data to ui layer (UI + ViewModel)
+ * observeDailyImage will show the result from database to UI, if we have then data else null
+ * refreshDailyImage will fetch the data from server and cache it offline and room will
+ * detect the change and emit the new value that will be observed by observeDailyImage
+ *
+ * NetworkDataSource interface is used to call network api
+ * ImageItemDao is used to get data from room database
+ */
+
 class NasaImageRepository @Inject constructor(
     private val networkDataSource: NetworkDataSource,
     private val imageItemDao: ImageItemDao
@@ -28,7 +38,7 @@ class NasaImageRepository @Inject constructor(
                 imageItemDao.save(result[0])
                 ResponseState.Success(Unit)
             } else {
-                ResponseState.Failure("Error: Contains no items in response")
+                ResponseState.Failure("NoContentError")
             }
         } catch (e: Exception) {
             ResponseState.Failure(e.message)
